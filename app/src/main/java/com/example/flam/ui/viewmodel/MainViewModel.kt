@@ -30,4 +30,8 @@ class MainViewModel @Inject constructor(
         Log.d("JNI_TEST", msg)
     }
 
+    fun processFrameInNative(bytes: ByteArray): ByteArray {
+        return nativeRepository.processFrame(bytes, 1280, 720)
+    }
+
 }

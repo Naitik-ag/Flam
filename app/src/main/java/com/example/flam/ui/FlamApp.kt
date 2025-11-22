@@ -45,7 +45,8 @@ fun FlamApp(
         if (permissionGranted) {
             LaunchedEffect(permissionGranted) {
                 viewModel.startCamera { frameBytes ->
-                    Log.d("CameraFrame", "Got frame = ${frameBytes.size} bytes")
+                    val processed = viewModel.processFrameInNative(frameBytes)
+                    Log.d("NativeFrame", "Processed frame = ${processed.size} bytes")
                 }
             }
         }else{

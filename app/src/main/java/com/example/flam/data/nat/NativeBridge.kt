@@ -7,4 +7,10 @@ object NativeBridge {
     }
 
     external fun test(): String
+
+    external fun processFrame(
+        frameData: ByteArray,
+        width: Int,
+        height: Int
+    ): ByteArray
 }
