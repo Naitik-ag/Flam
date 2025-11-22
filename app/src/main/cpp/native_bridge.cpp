@@ -5,7 +5,7 @@
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_edgeviewer_jni_NativeBridge_test(JNIEnv* env, jobject thiz) {
+Java_com_example_flam_data_nat_NativeBridge_test(JNIEnv* env, jobject thiz) {
     LOGI("JNI is working");
     return env->NewStringUTF("Hello from C++");
 }

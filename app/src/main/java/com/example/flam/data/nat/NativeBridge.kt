@@ -1,4 +1,4 @@
-package com.example.flam.jni
+package com.example.flam.data.nat
 
 object NativeBridge {
 
