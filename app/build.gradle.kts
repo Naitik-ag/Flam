@@ -19,10 +19,13 @@ android {
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a","x86_64")
         }
-
+        packagingOptions {
+            jniLibs.useLegacyPackaging = true
+        }
         externalNativeBuild {
             cmake {
                 cppFlags += listOf("-std=c++17", "-O2")
+                arguments += listOf("-DANDROID_STL=c++_shared")
             }
         }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -9,15 +9,18 @@ class NativeRepository @Inject constructor() {
     fun testNative(): String {
         return NativeBridge.test()
     }
-    fun processFrame(
-        frameData: ByteArray,
+    fun processNV21(
+        frame: ByteArray,
         width: Int,
-        height: Int
-    ): ByteArray{
-        return NativeBridge.processFrame(
-            frameData,
-            width,
-            height
-        );
+        height: Int,
+        mode: Int,
+        t1: Int,
+        t2: Int
+    ): ByteArray {
+        return NativeBridge.processFrameNV21(frame, width, height, mode, t1, t2)
+    }
+
+    fun testOpenCV(): String{
+        return NativeBridge.testOpenCV();
     }
 }
