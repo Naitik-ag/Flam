@@ -49,9 +49,8 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
     // Pre-alloc mats
     cv::Mat gray, edges, rgba;
     bool motionDetected = false;
-    const int motionThresh = max(5, t1); // fallback defaults
+    const int motionThresh = max(25, t1); // fallback defaults
 
-    // Mode handling
     switch (mode) {
         case 0: // RAW RGBA
             cv::cvtColor(bgr, rgba, cv::COLOR_BGR2RGBA);
@@ -68,6 +67,15 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
             cv::cvtColor(edges, rgba, cv::COLOR_GRAY2RGBA);
             break;
 
+        case 3: { // THRESHOLD MODE
+            cv::cvtColor(bgr, gray, cv::COLOR_BGR2GRAY);
+
+            cv::Mat thresh;
+            cv::threshold(gray, thresh, t1, 255, cv::THRESH_BINARY);
+
+            cv::cvtColor(thresh, rgba, cv::COLOR_GRAY2RGBA);
+            break;
+        }
         default:
             cv::cvtColor(bgr, rgba, cv::COLOR_BGR2RGBA);
     }
@@ -92,25 +100,22 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
             cv::threshold(diff, motionMask, motionThresh, 255, cv::THRESH_BINARY);
 
             // Optional: morphological open to reduce noise
-            cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
-            cv::morphologyEx(motionMask, motionMask, cv::MORPH_OPEN, kernel);
+            cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
+            morphologyEx(motionMask, motionMask, cv::MORPH_OPEN, kernel);
+            morphologyEx(motionMask, motionMask, cv::MORPH_CLOSE, kernel);
 
-            // Find contours on motion mask
             std::vector<std::vector<cv::Point>> contours;
             cv::findContours(motionMask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-            // Draw bounding boxes for sufficiently large contours
             for (const auto &cnt : contours) {
                 const double area = cv::contourArea(cnt);
-                if (area < 100.0) continue; // skip tiny noise contours (tweakable)
+                if (area < 1500.0) continue;
 
                 cv::Rect box = cv::boundingRect(cnt);
-                // Draw rectangle on rgba (red box, thickness 2)
                 cv::rectangle(rgba, box, cv::Scalar(255, 0, 0, 255), 2); // RGBA: R=255, G=0, B=0, A=255
                 motionDetected = true;
             }
 
-            // If motion detected, draw a small red dot at top-left as flag (2x2 pixel)
             if (motionDetected && rgba.rows > 4 && rgba.cols > 4) {
                 for (int y = 1; y <= 3; ++y) {
                     for (int x = 1; x <= 3; ++x) {
@@ -124,7 +129,6 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
             }
         }
 
-        // update previous frame (copy)
         g_prevGray = gray.clone();
     }
 

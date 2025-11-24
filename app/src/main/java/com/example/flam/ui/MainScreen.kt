@@ -69,7 +69,7 @@ fun MainScreen(viewModel: MainViewModel) {
         Text("Mode", fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
 
-        val modes = listOf("RAW", "GRAY", "CANNY", "SOBEL", "THRESH")
+        val modes = listOf("RAW", "GRAY", "CANNY", "THRESH")
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -90,22 +90,36 @@ fun MainScreen(viewModel: MainViewModel) {
 
         Spacer(Modifier.height(20.dp))
 
-        if (mode == 2 || mode == 3 || mode == 4) { // Canny, Sobel, Threshold
-            Text("Threshold 1: $t1")
-            Slider(
-                value = t1.toFloat(),
-                onValueChange = { viewModel.t1.value = it.toInt() },
-                valueRange = 0f..255f
-            )
+        when (mode) {
 
-            Spacer(Modifier.height(8.dp))
+            // CANNY mode → both sliders
+            2 -> {
+                Text("Lower Threshold (T1): $t1")
+                Slider(
+                    value = t1.toFloat(),
+                    onValueChange = { viewModel.t1.value = it.toInt() },
+                    valueRange = 0f..255f
+                )
 
-            Text("Threshold 2: $t2")
-            Slider(
-                value = t2.toFloat(),
-                onValueChange = { viewModel.t2.value = it.toInt() },
-                valueRange = 0f..255f
-            )
+                Spacer(Modifier.height(8.dp))
+
+                Text("Upper Threshold (T2): $t2")
+                Slider(
+                    value = t2.toFloat(),
+                    onValueChange = { viewModel.t2.value = it.toInt() },
+                    valueRange = 0f..255f
+                )
+            }
+
+            // THRESH mode → only T1
+            3 -> {
+                Text("Threshold (T1): $t1")
+                Slider(
+                    value = t1.toFloat(),
+                    onValueChange = { viewModel.t1.value = it.toInt() },
+                    valueRange = 0f..255f
+                )
+            }
         }
 
         Spacer(Modifier.height(20.dp))
