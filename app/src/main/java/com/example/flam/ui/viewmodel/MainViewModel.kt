@@ -1,12 +1,15 @@
 package com.example.flam.ui.viewmodel
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flam.data.camera.CameraController
 import com.example.flam.data.camera.FrameExtractor
 import com.example.flam.data.nat.NativeRepository
+import com.example.flam.data.web.WSClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,14 +97,33 @@ class MainViewModel @Inject constructor(
     fun captureSnapshot(): String? {
         val bmp = _bitmap.value ?: return null
 
+        // Rotate bitmap 90 degrees clockwise for web (adjust if you need counterclockwise)
+        val matrix = Matrix().apply { postRotate(90f) }
+        val rotatedBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, false)
+
         val stream = ByteArrayOutputStream()
-        bmp.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+        rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 90, stream)
         val jpegBytes = stream.toByteArray()
+
+        // recycle rotated bitmap if you want
+        if (rotatedBmp != bmp) rotatedBmp.recycle()
 
         return Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
     }
 
-    fun testJNI() = nativeRepository.testNative()
+    private val ws = WSClient("ws://192.168.1.34:8080")
 
-    fun testOpenCV() = nativeRepository.testOpenCV()
+    fun connectWeb() {
+        Log.d("WS_CLIENT", "Trying to connect to WS...")
+        ws.connect()
+    }
+
+    fun sendSnapshotToWeb() {
+        val b64 = captureSnapshot() ?: run {
+            Log.e("WS_CLIENT", "Snapshot was null")
+            return
+        }
+        Log.d("WS_CLIENT", "Captured snapshot base64 length = ${b64.length}")
+        ws.sendBase64(b64)
+    }
 }

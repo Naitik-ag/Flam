@@ -20,6 +20,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.startCamera()
+        viewModel.connectWeb()
     }
 
     // ViewModel state
@@ -126,8 +127,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
         Button(
             onClick = {
-                val base64 = viewModel.captureSnapshot()
-                println("Snapshot Base64 length = ${base64?.length}")
+                viewModel.sendSnapshotToWeb()
             },
             modifier = Modifier.fillMaxWidth()
         ) {
