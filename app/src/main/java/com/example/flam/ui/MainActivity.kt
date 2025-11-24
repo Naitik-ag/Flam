@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.flam.ui.theme.FlamTheme
+import com.example.flam.ui.theme.FLAMTheme
 import com.example.flam.util.PermissionUtils
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            FlamTheme {
+            FLAMTheme {
                 FlamApp(permissionGranted)
             }
         }

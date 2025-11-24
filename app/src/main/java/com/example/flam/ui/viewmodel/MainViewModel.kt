@@ -12,10 +12,14 @@ import com.example.flam.data.nat.NativeRepository
 import com.example.flam.data.web.WSClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -32,7 +36,8 @@ class MainViewModel @Inject constructor(
     private var outputBitmap: Bitmap? = null
     private var width = 0
     private var height = 0
-
+    val frameWidth: Int get() = width
+    val frameHeight: Int get() = height
     @Volatile
     private var isProcessing = false
 
@@ -43,6 +48,15 @@ class MainViewModel @Inject constructor(
     var t1 = MutableStateFlow(50)
     var t2 = MutableStateFlow(150)
 
+    private val _processingMs = MutableStateFlow(0L)
+    val processingMs = _processingMs.asStateFlow()
+
+    // Frame resolution exposed as flows (for UI stats panel)
+    private val _frameWidth = MutableStateFlow(0)
+    val frameWidthFlow = _frameWidth.asStateFlow()
+
+    private val _frameHeight = MutableStateFlow(0)
+    val frameHeightFlow = _frameHeight.asStateFlow()
 
     fun startCamera() {
         cameraController.start { image ->
@@ -52,6 +66,10 @@ class MainViewModel @Inject constructor(
                 width = image.width
                 height = image.height
                 outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+                // UPDATE RESOLUTION FLOWS
+                _frameWidth.value = width
+                _frameHeight.value = height
             }
 
             val nv21 = FrameExtractor.extract(image)  // image is closed inside extractor
@@ -81,6 +99,8 @@ class MainViewModel @Inject constructor(
                 )
             }
 
+            _processingMs.value = timeMs
+
             val fpsValue = if (timeMs > 0) 1000f / timeMs else 0f
             _fps.value = fpsValue
 
@@ -91,7 +111,22 @@ class MainViewModel @Inject constructor(
             }
 
             isProcessing = false
+            pushFrameToGL(rgba)
         }
+
+    }
+
+    val glFrame = AtomicReference<ByteBuffer?>(null)
+    // MutableSharedFlow used to signal Compose to call requestRender()
+    val glRequest = MutableSharedFlow<Unit>(replay = 0)
+    private fun pushFrameToGL(rgba: ByteArray) {
+        // create or reuse direct buffer
+        val buf = ByteBuffer.allocateDirect(rgba.size).order(ByteOrder.nativeOrder())
+        buf.put(rgba)
+        buf.position(0)
+        glFrame.set(buf)
+        // signal GLSurfaceView to render (non-blocking)
+        viewModelScope.launch { glRequest.emit(Unit) }
     }
 
     fun captureSnapshot(): String? {
