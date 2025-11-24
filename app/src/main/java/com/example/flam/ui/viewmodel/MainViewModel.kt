@@ -43,17 +43,20 @@ class MainViewModel @Inject constructor(
 
     fun startCamera() {
         cameraController.start { image ->
-            val nv21 = FrameExtractor.extract(image)
 
+            // Must read FIRST — before extraction, because extraction closes image
             if (width == 0 || height == 0) {
                 width = image.width
                 height = image.height
                 outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             }
 
+            val nv21 = FrameExtractor.extract(image)  // image is closed inside extractor
             processFrame(nv21)
         }
     }
+
+
 
     fun stopCamera() = cameraController.stop()
 

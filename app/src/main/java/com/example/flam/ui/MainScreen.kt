@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.flam.ui.viewmodel.MainViewModel
@@ -48,7 +49,11 @@ fun MainScreen(viewModel: MainViewModel) {
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = "Processed Frame",
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer {
+                            rotationZ = 90f
+                        }
                 )
             } else {
                 Text("Waiting for camera…", fontWeight = FontWeight.SemiBold)

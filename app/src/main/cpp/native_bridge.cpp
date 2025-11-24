@@ -128,6 +128,7 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
         g_prevGray = gray.clone();
     }
 
+
     // Convert RGBA mat data to a jbyteArray
     int outSize = static_cast<int>(rgba.total() * rgba.elemSize()); // width * height * 4
     jbyteArray out = env->NewByteArray(outSize);

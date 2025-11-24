@@ -75,6 +75,18 @@ class CameraController @Inject constructor(
         val cam = cameraDevice ?: return
         val readerSurface = imageReader?.surface ?: return
 
+        // READ SENSOR ORIENTATION
+        val characteristics = cameraManager.getCameraCharacteristics(cam.id)
+        val sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 90
+        val deviceRotation = getDisplayRotationDegrees()
+        val jpegOrientation = (sensorOrientation - deviceRotation + 360) % 360
+        // COMPUTE PREVIEW ROTATION (FINAL FIX)
+        val rotation = when (sensorOrientation) {
+            90  -> 0
+            270 -> 180
+            else -> 0
+        }
+
         cam.createCaptureSession(
             listOf(readerSurface),
             object : CameraCaptureSession.StateCallback() {
@@ -82,11 +94,10 @@ class CameraController @Inject constructor(
                 override fun onConfigured(session: CameraCaptureSession) {
                     captureSession = session
 
-                    val request = cam.createCaptureRequest(
-                        CameraDevice.TEMPLATE_PREVIEW
-                    ).apply {
+                    val request = cam.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
                         addTarget(readerSurface)
                         set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+                        set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation)
                     }
 
                     session.setRepeatingRequest(request.build(), null, null)
@@ -95,10 +106,20 @@ class CameraController @Inject constructor(
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                     Log.e(TAG, "Capture session config failed")
                 }
-
             },
             null
         )
+    }
+
+    private fun getDisplayRotationDegrees(): Int {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager
+        return when (wm.defaultDisplay.rotation) {
+            android.view.Surface.ROTATION_0 -> 0
+            android.view.Surface.ROTATION_90 -> 90
+            android.view.Surface.ROTATION_180 -> 180
+            android.view.Surface.ROTATION_270 -> 270
+            else -> 0
+        }
     }
 
     fun stop() {
