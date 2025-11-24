@@ -182,16 +182,16 @@ npm run serv
 # 📷 Screenshots(All are motion detecting)
 
 ## Raw Mode
-![Raw Mode](assets/raw.png)
+![Raw Mode](assets/raw.jpg)
 
 ## Gray Mode
-![Gray Mode](assets/gray.png)
+![Gray Mode](assets/gray.jpg)
 
 ## Canny Mode
-![Canny Mode](assets/canny.png)
+![Canny Mode](assets/canny.jpg)
 
 ## Threshold Mode
-![Threshold Mode](assets/thresh.png)
+![Threshold Mode](assets/thresh.jpg)
 
 ## WebView Mode
 ![WebView Mode](assets/web.png)
