@@ -49,7 +49,7 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
     // Pre-alloc mats
     cv::Mat gray, edges, rgba;
     bool motionDetected = false;
-    const int motionThresh = max(25, t1); // fallback defaults
+    const int motionThresh = 37; // fallback defaults
 
     switch (mode) {
         case 0: // RAW RGBA
@@ -100,7 +100,7 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
             cv::threshold(diff, motionMask, motionThresh, 255, cv::THRESH_BINARY);
 
             // Optional: morphological open to reduce noise
-            cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5,5));
+            cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
             morphologyEx(motionMask, motionMask, cv::MORPH_OPEN, kernel);
             morphologyEx(motionMask, motionMask, cv::MORPH_CLOSE, kernel);
 
@@ -109,7 +109,7 @@ Java_com_example_flam_data_nat_NativeBridge_processFrameNV21(
 
             for (const auto &cnt : contours) {
                 const double area = cv::contourArea(cnt);
-                if (area < 1500.0) continue;
+                if (area < 800.0) continue;
 
                 cv::Rect box = cv::boundingRect(cnt);
                 cv::rectangle(rgba, box, cv::Scalar(255, 0, 0, 255), 2); // RGBA: R=255, G=0, B=0, A=255

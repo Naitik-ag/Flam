@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>FLAM Web Viewer</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #container {
+            background: #1b1b1b;
+            border-radius: 12px;
+            padding: 16px;
+            width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.4);
+        }
+
+        #previewBox {
+            width: 400px;
+            height: 400px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #stats {
+            margin-top: 12px;
+            width: 100%;
+            background: #222;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .label {
+            color: #aaa;
+        }
+
+        .value {
+            color: #4A90E2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="container">
+    <h2>FLAM Web Viewer</h2>
+
+    <div id="previewBox">
+        <img id="preview" src="" alt="No image yet" />
+    </div>
+
+    
+</div>
+
+<script src="viewer.js"></script>
+</body>
+</html>

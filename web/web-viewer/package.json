@@ -1,0 +1,13 @@
+{
+  "name": "flam-webviewer",
+  "version": "1.0.0",
+  "scripts": {
+  "build": "tsc",
+  "dev": "tsc --watch",
+  "serve": "live-server ./dist --port=8081"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "typescript": "^5.6.3"
+  }
+}

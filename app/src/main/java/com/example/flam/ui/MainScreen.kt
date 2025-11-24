@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.flam.data.camera.GLTextureRenderer
+import com.example.flam.gl.GLTextureRenderer
 import com.example.flam.ui.viewmodel.MainViewModel
 
 @Composable
