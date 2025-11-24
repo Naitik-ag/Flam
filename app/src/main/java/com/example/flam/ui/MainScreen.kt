@@ -4,24 +4,22 @@ import android.content.Context
 import android.opengl.GLSurfaceView
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.flam.data.camera.GLTextureRenderer
 import com.example.flam.ui.viewmodel.MainViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 
     LaunchedEffect(Unit) {
-        viewModel.startCamera()
         viewModel.connectWeb()
     }
 
@@ -222,18 +220,12 @@ fun SliderCard(label: String, value: Int, onChange: (Int) -> Unit, range: IntRan
 fun ActionBar(onCapture: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = onCapture,
             modifier = Modifier.weight(1f)
         ) { Text("Capture") }
 
-        Spacer(Modifier.width(12.dp))
-
-        Button(
-            onClick = { /* settings if needed */ },
-            modifier = Modifier.weight(1f)
-        ) { Text("Settings") }
     }
 }

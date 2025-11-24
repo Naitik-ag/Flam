@@ -89,7 +89,6 @@ class GLTextureRenderer(
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texId)
         GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1)
 
-        // allocate or reallocate texture storage only when size changes
         if (w != allocatedW || h != allocatedH) {
             GLES20.glTexImage2D(
                 GLES20.GL_TEXTURE_2D,
@@ -106,7 +105,6 @@ class GLTextureRenderer(
             allocatedH = h
         }
 
-        // upload pixel data
         frameBuf.position(0)
         GLES20.glTexSubImage2D(
             GLES20.GL_TEXTURE_2D,
@@ -120,7 +118,6 @@ class GLTextureRenderer(
             frameBuf
         )
 
-        // draw textured quad
         GLES20.glUseProgram(program)
         GLES20.glEnableVertexAttribArray(positionHandle)
         GLES20.glVertexAttribPointer(positionHandle, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer)

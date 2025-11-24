@@ -75,12 +75,10 @@ class CameraController @Inject constructor(
         val cam = cameraDevice ?: return
         val readerSurface = imageReader?.surface ?: return
 
-        // READ SENSOR ORIENTATION
         val characteristics = cameraManager.getCameraCharacteristics(cam.id)
         val sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 90
         val deviceRotation = getDisplayRotationDegrees()
         val jpegOrientation = (sensorOrientation - deviceRotation + 360) % 360
-        // COMPUTE PREVIEW ROTATION (FINAL FIX)
         val rotation = when (sensorOrientation) {
             90  -> 0
             270 -> 180

@@ -60,19 +60,16 @@ class MainViewModel @Inject constructor(
 
     fun startCamera() {
         cameraController.start { image ->
-
-            // Must read FIRST — before extraction, because extraction closes image
             if (width == 0 || height == 0) {
                 width = image.width
                 height = image.height
                 outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
-                // UPDATE RESOLUTION FLOWS
                 _frameWidth.value = width
                 _frameHeight.value = height
             }
 
-            val nv21 = FrameExtractor.extract(image)  // image is closed inside extractor
+            val nv21 = FrameExtractor.extract(image)
             processFrame(nv21)
         }
     }
@@ -82,7 +79,7 @@ class MainViewModel @Inject constructor(
     fun stopCamera() = cameraController.stop()
 
     private fun processFrame(nv21: ByteArray) {
-        if (isProcessing) return   // BACKPRESSURE: drop frame
+        if (isProcessing) return
         isProcessing = true
 
         viewModelScope.launch(Dispatchers.Default) {
@@ -117,10 +114,8 @@ class MainViewModel @Inject constructor(
     }
 
     val glFrame = AtomicReference<ByteBuffer?>(null)
-    // MutableSharedFlow used to signal Compose to call requestRender()
     val glRequest = MutableSharedFlow<Unit>(replay = 0)
     private fun pushFrameToGL(rgba: ByteArray) {
-        // create or reuse direct buffer
         val buf = ByteBuffer.allocateDirect(rgba.size).order(ByteOrder.nativeOrder())
         buf.put(rgba)
         buf.position(0)
@@ -132,7 +127,7 @@ class MainViewModel @Inject constructor(
     fun captureSnapshot(): String? {
         val bmp = _bitmap.value ?: return null
 
-        // Rotate bitmap 90 degrees clockwise for web (adjust if you need counterclockwise)
+        // Rotate bitmap 90 degrees clockwise for web
         val matrix = Matrix().apply { postRotate(90f) }
         val rotatedBmp = Bitmap.createBitmap(bmp, 0, 0, bmp.width, bmp.height, matrix, false)
 
@@ -140,7 +135,6 @@ class MainViewModel @Inject constructor(
         rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 90, stream)
         val jpegBytes = stream.toByteArray()
 
-        // recycle rotated bitmap if you want
         if (rotatedBmp != bmp) rotatedBmp.recycle()
 
         return Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
